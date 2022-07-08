@@ -1,7 +1,17 @@
 <template>
   <a-layout class="home">
-    <a-layout-sider hide-trigger style="overflow: hidden;" :width="430" :collapsed-width="68" :collapsed="collapsed">
-      <div class="logo" :class="{ collapsed }" :style="{ height: `${headerHeight}px` }">
+    <a-layout-sider
+      hide-trigger
+      style="overflow: hidden"
+      :width="430"
+      :collapsed-width="68"
+      :collapsed="collapsed"
+    >
+      <div
+        class="logo"
+        :class="{ collapsed }"
+        :style="{ height: `${headerHeight}px` }"
+      >
         <div class="logo-content">
           <div v-if="collapsed" style="text-align: center">
             <div class="overflow-hidden">
@@ -10,45 +20,100 @@
               </div>
             </div>
           </div>
-          <a-image v-else :height="24" :src="Logo" style="width: 160px" :preview="false"/>
+          <a-image
+            v-else
+            :height="24"
+            :src="Logo"
+            style="width: 160px"
+            :preview="false"
+          />
         </div>
       </div>
-      <div class="home-menus" :style="{ height: `calc(100% - ${headerHeight}px)` }">
-        <Menus v-if="showConfig" ref="MenusRef" :selectedModel="selectedModel" @loadModel="onloadModel"
-          @selectPart="onselectPart" @menuClick="onClickMenu"></Menus>
+      <div
+        class="home-menus"
+        :style="{ height: `calc(100% - ${headerHeight}px)` }"
+      >
+        <Menus
+          v-if="showConfig"
+          ref="MenusRef"
+          :selectedModel="selectedModel"
+          @loadModel="onloadModel"
+          @selectPart="onselectPart"
+          @menuClick="onClickMenu"
+        ></Menus>
       </div>
     </a-layout-sider>
     <a-layout>
-      <a-layout-header class="home-header" style="padding: 0 16px" :style="{ height: `${headerHeight}px` }">
+      <a-layout-header
+        class="home-header"
+        style="padding: 0 16px"
+        :style="{ height: `${headerHeight}px` }"
+      >
         <a-space align="center">
           <a-tooltip title="重置相机">
-            <img class="cursor-pointer" src="../../assets/img/camera.svg" style="width: 23px; height: 23px"
-              @click="onclickResetCamera" />
+            <img
+              class="cursor-pointer"
+              src="../../assets/img/camera.svg"
+              style="width: 23px; height: 23px"
+              @click="onclickResetCamera"
+            />
           </a-tooltip>
-          <a-upload action="/" :beforeUpload="() => false" :showUploadList="false" @change="onuploadAllConfigChange">
+          <a-upload
+            action="/"
+            :beforeUpload="() => false"
+            :showUploadList="false"
+            @change="onuploadAllConfigChange"
+          >
             <a-tooltip title="加载配置">
-              <img src="../../assets/img/icon-02.svg" style="width: 23px; height: 23px" />
+              <img
+                src="../../assets/img/icon-02.svg"
+                style="width: 23px; height: 23px"
+              />
             </a-tooltip>
           </a-upload>
         </a-space>
 
         <a-space>
           <a-tooltip title="业务案例">
-            <div class="flex justify-center align:center"
-              style="background:rgb(46,46,46);border-radius: 5px;width:36px;height:36px;">
-              <img class="cursor-pointer" style="width: 18px;" src="../../assets/img/link.svg" @click="goBusiness" />
+            <div
+              class="flex justify-center align:center"
+              style="
+                background: rgb(46, 46, 46);
+                border-radius: 5px;
+                width: 36px;
+                height: 36px;
+              "
+            >
+              <img
+                class="cursor-pointer"
+                style="width: 18px"
+                src="../../assets/img/link.svg"
+                @click="goBusiness"
+              />
             </div>
           </a-tooltip>
           <a-tooltip title="模型预览">
-            <img class="cursor-pointer" src="../../assets/img/icon-head-01.svg" @click="showModelPreview" />
+            <img
+              class="cursor-pointer"
+              src="../../assets/img/icon-head-01.svg"
+              @click="showModelPreview"
+            />
           </a-tooltip>
           <a-tooltip title="导出所有配置">
-            <img class="cursor-pointer" src="../../assets/img/icon-head-02.svg" @click="exportAll" />
+            <img
+              class="cursor-pointer"
+              src="../../assets/img/icon-head-02.svg"
+              @click="exportAll"
+            />
           </a-tooltip>
           <a-tooltip title="代码">
-            <img class="cursor-pointer" src="../../assets/img/icon-head-03.svg" @click="showCode" />
+            <img
+              class="cursor-pointer"
+              src="../../assets/img/icon-head-03.svg"
+              @click="showCode"
+            />
           </a-tooltip>
-          <a-button type="primary" @click="exportImg">导出图片</a-button>
+          <a-button type="primary" @click.prevent="showExport">导出</a-button>
         </a-space>
       </a-layout-header>
       <a-layout :style="{ height: `calc(100% - ${headerHeight}px)` }">
@@ -59,18 +124,22 @@
           </div>
           <CanvasArea @engineInited="onengineInited"></CanvasArea>
         </a-layout-content>
-        <a-layout-sider v-if="showConfig" :width="300" class="overflow-auto beauty-scroll home-sider-config">
+        <a-layout-sider
+          v-if="showConfig"
+          :width="300"
+          class="overflow-auto beauty-scroll home-sider-config"
+        >
           <MaterialConfig ref="MaterialConfigRef" />
         </a-layout-sider>
       </a-layout>
     </a-layout>
   </a-layout>
 
-  <!-- 导出图片 -->
+  <!-- 导出 -->
   <a-modal v-model:visible="visible" :footer="false">
-    <template #title>导出图片</template>
+    <template #title>导出</template>
     <div>
-      <ExportImg />
+      <Export :generateAllConfig="generateAllConfig"/>
     </div>
   </a-modal>
 
@@ -80,28 +149,35 @@
 <script lang="ts" setup>
 import { ref, onMounted, reactive, computed, provide } from "vue";
 import { useRouter } from "vue-router";
-import { CodeOutlined } from '@ant-design/icons-vue';
+import { CodeOutlined } from "@ant-design/icons-vue";
 import Menus from "./components/menus/index.vue";
 import CanvasArea from "./components/canvasArea/index.vue";
 import MaterialConfig from "./components/materialConfig/index.vue";
-import ModelPreview from '@/components/ModelPreview/index.vue'
-import { IO } from '@/oasis/utils/io';
-import { ModelConfigJsonType } from '@/common/interface'
+import ModelPreview from "@/components/ModelPreview/index.vue";
+import { IO } from "@/oasis/utils/io";
+import { ModelConfigJsonType } from "@/common/interface";
 
 import Logo from "@/assets/img/logo.png";
 
-import { UploadOutlined, RightOutlined, LeftOutlined } from '@ant-design/icons-vue';
+import {
+  UploadOutlined,
+  RightOutlined,
+  LeftOutlined,
+} from "@ant-design/icons-vue";
 
-import { LocalModelType, ModelAssetsManager } from "@/manager/ModelAssetsManager";
+import {
+  LocalModelType,
+  ModelAssetsManager,
+} from "@/manager/ModelAssetsManager";
 import { exportToFile } from "@/utils/utils";
 
-import ExportImg from "@/components/ExportImg/index.vue";
+import Export from "@/components/Export/index.vue";
 import { GameManager } from "@/oasis";
 import { cloneDeep } from "lodash-es";
 import { OnePart } from "@/common/OnePart";
 import { MeshRenderer } from "oasis-engine";
 
-const router = useRouter()
+const router = useRouter();
 
 let headerHeight = 70;
 
@@ -118,37 +194,44 @@ function onengineInited() {
 
   /** 监听保存当前模型所有配置数据 */
   GameManager.ins.engine.on(IO.SAVE_ALL_CONFIG, (e: any) => {
-
-    const modelAllConfig = generateAllConfig()
+    const modelAllConfig = generateAllConfig();
     if (modelAllConfig) {
-      localStorage.setItem(`modelConfig:${modelAllConfig.model.url}`, JSON.stringify(modelAllConfig))
+      localStorage.setItem(
+        `modelConfig:${modelAllConfig.model.url}`,
+        JSON.stringify(modelAllConfig)
+      );
     }
   });
 }
 
 const MaterialConfigRef = ref<InstanceType<typeof MaterialConfig>>();
-const ModelList = cloneDeep(ModelAssetsManager.ModelList)
+const ModelList = cloneDeep(ModelAssetsManager.ModelList);
 const selectedModelPath = ref(ModelList[0].path);
 let selectedModel = computed(() => {
-  
-  return ModelAssetsManager.getModelInfoByPath(selectedModelPath.value) || { path: selectedModelPath.value, name: '未知'}}
-);
+  return (
+    ModelAssetsManager.getModelInfoByPath(selectedModelPath.value) || {
+      path: selectedModelPath.value,
+      name: "未知",
+    }
+  );
+});
 
 /**点击更换模型回调 */
 function onloadModel(modelPath: string) {
-
-  selectedModelPath.value = modelPath
+  selectedModelPath.value = modelPath;
   refreshModel();
 
   // 检查本地是否有该模型的配置缓存
-  let configCache: string | ModelConfigJsonType | null = localStorage.getItem(`modelConfig:${selectedModel.value.path}`);
+  let configCache: string | ModelConfigJsonType | null = localStorage.getItem(
+    `modelConfig:${selectedModel.value.path}`
+  );
   if (configCache) {
     // 本地有缓存
     try {
-      configCache = JSON.parse(configCache) as ModelConfigJsonType
+      configCache = JSON.parse(configCache) as ModelConfigJsonType;
       MaterialConfigRef.value?.loadAllConfig(configCache);
     } catch (err) {
-      console.error(err)
+      console.error(err);
     }
   } else if (selectedModel.value.defaultConfig) {
     // 本地没有配置缓存 检查模型是否有默认配置
@@ -182,12 +265,12 @@ function onuploadAllConfigChange(res: any) {
 }
 /** 生成包含所有信息的配置 */
 function generateAllConfig() {
-  return MaterialConfigRef.value?.getAllConfig()
+  return MaterialConfigRef.value?.getAllConfig();
 }
 
 // 导出图片
 const visible = ref(false);
-const exportImg = () => {
+const showExport = () => {
   visible.value = true;
 };
 
@@ -196,40 +279,40 @@ function onclickResetCamera() {
   GameManager.ins.resetCamera();
 }
 
-
 // 预览模型
-const ModelPreviewRef = ref(ModelPreview)
+const ModelPreviewRef = ref(ModelPreview);
 function showModelPreview() {
-  ModelPreviewRef.value.showModal(generateAllConfig())
+  ModelPreviewRef.value.showModal(generateAllConfig());
 }
 function showCode() {
-  ModelPreviewRef.value.showCode(generateAllConfig())
+  ModelPreviewRef.value.showCode(generateAllConfig());
 }
 
 // 点击菜单
 const onClickMenu = (isSame: boolean) => {
   if (isSame) {
-    onCollapse()
+    onCollapse();
   } else {
-    collapsed.value = false
+    collapsed.value = false;
   }
-}
+};
 
 /**打开业务demo链接 */
 function goBusiness() {
-  localStorage.setItem('businessAllData', JSON.stringify(generateAllConfig()))
-  window.open(router.resolve('/business').href)
+  localStorage.setItem("businessAllData", JSON.stringify(generateAllConfig()));
+  window.open(router.resolve("/business").href);
 }
 
 /**模型的部件列表 */
 const partsList = ref<Array<OnePart>>([]);
-provide('partsList', partsList)
+provide("partsList", partsList);
 /** 刷新模型部件列表 */
 function refreshModel() {
-  partsList.value = Array.from(GameManager.ins.renderers_in_modelGltf, (item: MeshRenderer) => new OnePart(item))
+  partsList.value = Array.from(
+    GameManager.ins.renderers_in_modelGltf,
+    (item: MeshRenderer) => new OnePart(item)
+  );
 }
-
-
 </script>
 
 <style lang="scss" scoped>

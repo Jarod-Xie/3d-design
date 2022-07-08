@@ -6,6 +6,7 @@ import { createRouter, createWebHashHistory } from "vue-router";
 const routes = [
   { path: "/", component: () => import("@/views/home/index.vue") },
   { path: "/business", component: () => import("@/views/business/index.vue") },
+  { path: "/record", component: () => import("@/views/record/index.vue") },
 ];
 
 // 3. 创建路由实例并传递 `routes` 配置
