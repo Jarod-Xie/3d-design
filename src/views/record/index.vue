@@ -62,7 +62,7 @@ onMounted(async () => {
   }
 
   await PreviewManager.ins.createEngine("recordCanvas", allDataConfig);
-  PreviewManager.ins.setMouseControlCamera(enableMouse=='true')
+  PreviewManager.ins.setMouseControlCamera(enableMouse == "true");
 
   store.toggleLoading(false);
 });
@@ -96,6 +96,9 @@ function onRecord() {
   // 媒体录制器开始录制
   isRecording.value = true;
   recorder.start();
+  
+  // 清空之前保存的数据流
+  blobs = [];
 
   time.value = 0;
   timeInterval = setInterval(() => {
@@ -105,7 +108,6 @@ function onRecord() {
 function saveVideo() {
   saveAs(new Blob(blobs, { type: `video/${f}` }));
   // open(URL.createObjectURL(new Blob(blobs, { type: "video/mp4" })));
-  blobs = [];
 }
 
 /**
@@ -137,9 +139,9 @@ const transcode = async () => {
     `output.${formatValue.value.split("/")[1]}`
   );
   // ffmpeg.FS('unlink', name);
-  open(
-    URL.createObjectURL(new Blob([data.buffer], { type: formatValue.value }))
-  );
+  let b = new Blob([data.buffer], { type: formatValue.value });
+  saveAs(b);
+  // open(URL.createObjectURL(b));
 };
 </script>
 
