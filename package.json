@@ -8,6 +8,8 @@
   },
   "dependencies": {
     "@ant-design/icons-vue": "^6.0.1",
+    "@ffmpeg/core": "^0.10.0",
+    "@ffmpeg/ffmpeg": "^0.10.1",
     "@highlightjs/vue-plugin": "^2.1.0",
     "@oasis-engine/controls": "^0.6.6",
     "@oasis-engine/framebuffer-picker": "^0.6.6",
