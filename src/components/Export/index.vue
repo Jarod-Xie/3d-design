@@ -1,13 +1,13 @@
 <template>
   <a-form :model="form" layout="vertical">
     <a-form-item label="导出类型">
-      <a-select :style="{ width: '100%' }" v-model:value="exportType">
+      <a-select :style="{ width: '100%' }" v-model:value="form.exportType">
         <a-select-option v-for="(i, key) in ExportTypeEnum" :value="i">{{
           key
         }}</a-select-option>
       </a-select>
     </a-form-item>
-    <template v-if="exportType == ExportTypeEnum.图片">
+    <template v-if="form.exportType == ExportTypeEnum.图片">
       <a-form-item label="图片宽度">
         <a-input-number
           v-model:value="form.width"
@@ -56,7 +56,8 @@
         >
       </div>
     </template>
-    <template v-else-if="exportType == ExportTypeEnum.视频">
+    
+    <template v-else-if="form.exportType == ExportTypeEnum.视频">
       <a-form-item label="视频格式">
         <a-select
           :style="{ width: '100%' }"
@@ -71,6 +72,8 @@
           >
         </a-select>
       </a-form-item>
+    </template>
+    <template v-if="form.exportType == ExportTypeEnum.视频 || form.exportType == ExportTypeEnum.GIF">
       <a-form-item label="FPS">
         <a-select :style="{ width: '100%' }" v-model:value="form.fps">
           <a-select-option :value="15">15</a-select-option>
@@ -80,10 +83,13 @@
           <a-select-option :value="60">60</a-select-option>
         </a-select>
       </a-form-item>
+      <a-form-item label="鼠标操作">
+        <a-switch v-model:checked="form.enableMouse" checked-children="开启" un-checked-children="关闭" />
+      </a-form-item>
       <div class="flex justify-end">
         <a-button
           type="primary"
-          @click="handleVideoClick"
+          @click="handleVideoGifClick"
           style="background-color: #ff6900"
           >开始</a-button
         >
@@ -95,28 +101,30 @@
 <script lang="ts" setup>
 import { defineComponent, reactive, ref } from "vue";
 import { GameManager } from "@/oasis/index";
-import { VideoFormatEnum } from "./enum";
+import { ExportTypeEnum, VideoFormatEnum } from "./enum";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
-enum ExportTypeEnum {
-  图片 = "picture",
-  视频 = "video",
-  GIF = "GIF",
-}
-let exportType = ref(ExportTypeEnum.图片);
+
 
 const props = defineProps({
   generateAllConfig: Function,
 });
 
 let form = reactive({
+  // 公共
+exportType: ExportTypeEnum.图片,
+  // 图片配置
   width: 1024,
   height: 1024,
   isPNG: "true",
   jpgQuality: 1,
+
+  // 视频配置
   format: VideoFormatEnum.MP4,
   fps: 30,
+  enableMouse: true
+
 });
 
 let size = ref(1);
@@ -129,13 +137,20 @@ const handleClick = () => {
 
   GameManager.ins.screenshot(width, height, ispng, form.jpgQuality);
 };
-const handleVideoClick = () => {
+const handleVideoGifClick = () => {
   if (props.generateAllConfig) {
     localStorage.setItem(
       "recordAllData",
       JSON.stringify(props.generateAllConfig())
     );
-    window.open(router.resolve("/record").href);
+    const { format, fps, exportType, enableMouse } = form
+    let query = `fps=${fps}&enableMouse=${enableMouse}`
+    if(exportType == ExportTypeEnum.GIF) {
+      query += `&type=${exportType}`
+    } else {
+      query += `&f=${format}`
+    }
+    window.open(router.resolve(`/record?${query}`).href);
   }
 };
 </script>

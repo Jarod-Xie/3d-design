@@ -399,6 +399,14 @@ export class PreviewManager {
         break;
     }
   }
+
+  /**
+   * 设置是否允许鼠标操作相机
+   */
+  setMouseControlCamera(status: boolean){
+    let orbit = this.camera.entity.getComponent(OrbitControl);
+    orbit.enableZoom = orbit.enablePan = orbit.enableRotate = !!status;
+  }
 }
 
 /**自旋转 */
